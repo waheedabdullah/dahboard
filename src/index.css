@@ -1,27 +1,18 @@
-@media (max-width: 600px) {
 
-    .auth-container {
-      padding: 15px;
+
+  @media (max-width: 600px) {
+    .card {
+      width: 92%;
+      margin: 20px auto;
+      padding: 20px;
     }
   
-    .auth-box {
-      width: 100%;
-      max-width: 100%;
-      margin: 10px;
-      padding: 18px;
-    }
-  
-    .auth-box input {
+    .card input {
       font-size: 14px;
-      padding: 10px;
     }
   
-    .auth-box button {
+    .card .login,
+    .card .signup {
       font-size: 14px;
-      padding: 10px;
-    }
-  
-    .auth-box h2 {
-      font-size: 20px;
     }
   }
