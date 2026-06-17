@@ -1,0 +1,27 @@
+@media (max-width: 600px) {
+
+    .auth-container {
+      padding: 15px;
+    }
+  
+    .auth-box {
+      width: 100%;
+      max-width: 100%;
+      margin: 10px;
+      padding: 18px;
+    }
+  
+    .auth-box input {
+      font-size: 14px;
+      padding: 10px;
+    }
+  
+    .auth-box button {
+      font-size: 14px;
+      padding: 10px;
+    }
+  
+    .auth-box h2 {
+      font-size: 20px;
+    }
+  }
