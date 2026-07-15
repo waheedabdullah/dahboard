@@ -1,27 +1,62 @@
 import "./App.css";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+
+import { auth } from "./firebase";
+import { onAuthStateChanged } from "firebase/auth";
 
 import Signin from "./Signin";
 import Signup from "./Signup";
 import Dashboard from "./Dashboard";
 
 function App() {
+
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // 🔥 user check (login hai ya nahi)
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+      setLoading(false);
+    });
+
+    return () => unsub();
+  }, []);
+
+  if (loading) return <h2>Loading...</h2>;
+
   return (
     <BrowserRouter>
       <Routes>
 
-        {/* Default route → Signin */}
-        <Route path="/" element={<Navigate to="/signin" />} />
+        {/* Default route */}
+        <Route
+          path="/"
+          element={
+            user ? <Navigate to="/dashboard" /> : <Navigate to="/signin" />
+          }
+        />
 
-        {/* Authentication pages */}
-        <Route path="/signin" element={<Signin />} />
-        <Route path="/signup" element={<Signup />} />
+        {/* Auth routes */}
+        <Route
+          path="/signin"
+          element={user ? <Navigate to="/dashboard" /> : <Signin />}
+        />
 
-        {/* Protected page (simple version) */}
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route
+          path="/signup"
+          element={user ? <Navigate to="/dashboard" /> : <Signup />}
+        />
 
-        {/* Fallback route */}
-        <Route path="*" element={<Navigate to="/signin" />} />
+        {/* Protected route */}
+        <Route
+          path="/dashboard"
+          element={user ? <Dashboard /> : <Navigate to="/signin" />}
+        />
+
+        {/* fallback */}
+        <Route path="*" element={<Navigate to="/" />} />
 
       </Routes>
     </BrowserRouter>

@@ -1,114 +1,38 @@
-// // import { auth } from "./firebase";
-// // import { signOut } from "firebase/auth";
-// // import { useNavigate } from "react-router-dom";
-
-// // function Dashboard() {
-// //   const navigate = useNavigate();
-// //   const user = auth.currentUser;
-
-// //   const logout = async () => {
-// //     await signOut(auth);
-// //     navigate("/signin");
-// //   };
-
-// //   return (
-// //     <div className="dash">
-// //       <h1>👋 Welcome</h1>
-
-// //       <h2>{user?.email}</h2>
-
-// //       <button onClick={logout}>Logout</button>
-// //     </div>
-// //   );
-// // }
-
-// // export default Dashboard;
 
 
-// import { auth } from "./firebase";
-// import { signOut } from "firebase/auth";
-// import { useNavigate } from "react-router-dom";
 
-// function Dashboard() {
-//   const navigate = useNavigate();
-//   const user = auth.currentUser;
-
-//   const logout = async () => {
-//     await signOut(auth);
-//     navigate("/signin");
-//   };
-
-//   return (
-//     <div style={styles.container}>
-//       <div style={styles.card}>
-//         <h1 style={styles.title}>👋 Welcome Back</h1>
-
-//         <p style={styles.text}>
-//           You are successfully logged in to your account.
-//         </p>
-
-//         <div style={styles.infoBox}>
-//           <p><b>Email:</b> {user?.email}</p>
-//           <p><b>Status:</b> Active 🟢</p>
-//         </div>
-
-//         <button style={styles.button} onClick={logout}>
-//           Logout
-//         </button>
-//       </div>
-//     </div>
-//   );
-// }
-
-// const styles = {
-//   container: {
-//     height: "100vh",
-//     display: "flex",
-//     justifyContent: "center",
-//     alignItems: "center",
-//     background: "#f4f6f8",
-//   },
-//   card: {
-//     background: "white",
-//     padding: "30px",
-//     borderRadius: "12px",
-//     boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
-//     textAlign: "center",
-//     width: "350px",
-//   },
-//   title: {
-//     marginBottom: "10px",
-//   },
-//   text: {
-//     color: "#666",
-//     marginBottom: "20px",
-//   },
-//   infoBox: {
-//     background: "#f1f1f1",
-//     padding: "15px",
-//     borderRadius: "8px",
-//     marginBottom: "20px",
-//     textAlign: "left",
-//   },
-//   button: {
-//     background: "#e74c3c",
-//     color: "white",
-//     border: "none",
-//     padding: "10px 20px",
-//     borderRadius: "6px",
-//     cursor: "pointer",
-//   },
-// };
-
-// export default Dashboard;
-
-import { auth } from "./firebase";
+import { auth, db } from "./firebase";
+import { doc, getDoc } from "firebase/firestore";
 import { signOut } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 function Dashboard() {
   const navigate = useNavigate();
-  const user = auth.currentUser;
+  const [userData, setUserData] = useState(null);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const user = auth.currentUser;
+
+      console.log("Current user:", user);
+
+      if (user) {
+        const userRef = doc(db, "users", user.uid);
+
+        const userSnap = await getDoc(userRef);
+
+        if (userSnap.exists()) {
+          setUserData(userSnap.data());
+          console.log(userSnap.data());
+        } else {
+          console.log("User data nahi mila");
+        }
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   const logout = async () => {
     await signOut(auth);
@@ -120,11 +44,40 @@ function Dashboard() {
       <div style={styles.card}>
         <h1 style={styles.title}>👋 Welcome Back</h1>
 
-        <p style={styles.subtitle}>You're successfully logged in</p>
+        <p style={styles.subtitle}>
+          You're successfully logged in
+        </p>
 
+        {userData?.photo && (
+  <img
+  src={userData.photo.replace("s96-c", "s200-c")}
+  // src="https://lh3.googleusercontent.com/a/ACg8ocJhB_2f6uTweDj-DVNByOlk8sNn025vgbheyMZK0JJH1LPdwX8cqg=s200-c"
+  // referrerPolicy="no-referrer"
+  alt="profile"
+    style={{
+      width: "80px",
+      height: "80px",
+      borderRadius: "50%",
+      marginBottom: "15px",
+    }}
+  />
+)}
         <div style={styles.info}>
-          <p><b>Email:</b> {user?.email}</p>
-          <p><b>Status:</b> 🟢 Active</p>
+          <p>
+            <b>Email:</b> {userData?.email}
+          </p>
+
+          <p>
+            <b>Name:</b> {userData?.name}
+          </p>
+
+          <p>
+            <b>Phone:</b> {userData?.phone}
+          </p>
+
+          <p>
+            <b>Status:</b> 🟢 Active
+          </p>
         </div>
 
         <button style={styles.button} onClick={logout}>
@@ -145,7 +98,7 @@ const styles = {
   },
 
   card: {
-    width: "280px",           // 👈 FIX: choti width
+    width: "280px",
     background: "#fff",
     padding: "20px",
     borderRadius: "14px",
